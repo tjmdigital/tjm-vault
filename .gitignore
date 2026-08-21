@@ -1,0 +1,12 @@
+# Never commit secrets. Tokens live in a local env file, referenced by name only.
+.env
+.env.*
+*.token
+secrets/
+
+# Obsidian churn - pane layout and caches change constantly
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.trash/
+.DS_Store

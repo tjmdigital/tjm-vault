@@ -5,9 +5,9 @@ pattern: "[[Stale lead ladder]]"
 variant: "2/3/14, single-person pools route to Molly, note counts as activity"
 enabled: false
 built: 2026-08-17
-blocked_on: "Molly's decision on Albir's records + notification recipient set in UI"
+blocked_on: "notification recipient set in UI + Nihil to confirm"
 verified: 2026-08-21
-hardcodes: []
+hardcodes: [Albir]
 ---
 # Stale lead ladder
 
