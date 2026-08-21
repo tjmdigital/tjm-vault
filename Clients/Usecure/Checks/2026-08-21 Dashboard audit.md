@@ -24,6 +24,11 @@ exclusion dropped.
 
 Verifies [[Picked up and worked]] and [[Any movement out of New]].
 
+## Still to fix
+
+- [ ] Repoint the "Picked up & worked" tile to A/C/Q - target 233 📅 2026-08-22
+- [ ] Re-cohort the lead funnel to 21 July and drop the cleanup exclusion 📅 2026-08-22
+
 ## Cannot be fixed from here
 
 HubSpot has **no public API for editing report filters** - the dashboard endpoints 404 or

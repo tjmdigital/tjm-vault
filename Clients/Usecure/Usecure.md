@@ -22,6 +22,11 @@ What is stuck and on whom lives on [[Now]] - not repeated here.
 Most recent verification: [[2026-08-21 Inbound flow check]] and [[2026-08-21 Dashboard audit]].
 Known open issue: [[RevenueHero writes contact owner]].
 
+## Owed to people
+
+- [ ] Send Scott the MSP revenue-generating status breakdown 📅 2026-08-25
+- [ ] Reply to Scott confirming the form change worked - blank rate 11% to 4% 📅 2026-08-22
+
 ## People
 
 | | Owns |

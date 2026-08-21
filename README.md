@@ -23,6 +23,7 @@ dashboard surfaces anything that has gone stale. The vault nags; you do not have
 
 ## Pages to know
 
+- **[[Today]]** - work with a date on it, across every client. Needs the Tasks plugin.
 - **[[Now]]** - what is stuck, on whom, and for how long. Derived, never maintained by hand.
 - **[[00 Dashboard]]** - the wider view: freshness, hardcoded people, pattern reuse.
 - **[[Patterns]]** - reusable mechanisms and where each is built.
@@ -36,8 +37,11 @@ suffix: `Stale lead ladder` is the pattern, `Stale lead ladder (Usecure)` is the
 Obsidian resolves wikilinks by filename alone, so two notes with the same name make every
 link to either of them ambiguous.
 
-Tasks with due dates live in Notion, not here. This vault holds the state of the world;
-Notion holds what you have to do about it.
+**Tasks live inside the note that explains them**, as `- [ ] thing 📅 YYYY-MM-DD`, and surface
+on [[Today]]. Putting them next to the context means picking one up cold costs nothing.
+
+`Now` is state - what is stuck and on whom. `Today` is work - what has a date. A thing can be
+on both.
 
 ## The one rule
 
@@ -54,5 +58,6 @@ gitignored `.env`.
 
 ## Requires
 
-- [Dataview](https://github.com/blacksmithgu/obsidian-dataview) - the queries below need it
+- [Dataview](https://github.com/blacksmithgu/obsidian-dataview) - most queries need it
+- [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) - [[Today]] needs it
 - [Obsidian Git](https://github.com/Vinzent03/obsidian-git) - pull on open, push on change

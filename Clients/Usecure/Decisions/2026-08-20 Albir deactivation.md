@@ -52,6 +52,8 @@ Chris (14), Dominic (13), Gerson (9), Alex Campbell (7), AJ (6) and a tail.
 > It is a hardcoded owner ID in the ladder's enrolment filter. Left in place after his leads
 > move, it silently exempts whoever ends up owning them.
 
+- [ ] Lift the Albir guard from the ladder once his records are reassigned 📅 2026-09-01
+
 ## The meetings, deliberately not raised
 
 He is host on **7 upcoming meetings**, two of them RevenueHero demos with prospects - Monday

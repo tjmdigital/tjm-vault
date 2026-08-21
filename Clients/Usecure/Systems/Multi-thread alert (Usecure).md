@@ -16,6 +16,8 @@ Agreed **June 2026**, built **21 August 2026**. Two months in which sales raised
 complaint twice in the channel - the clearest example of an agreed thing quietly not
 getting built.
 
+- [ ] Review the build and switch on - nothing upstream of it 📅 2026-08-26
+
 New contact converts at a company with an open deal, no lead is created, and a task lands
 with the deal owner to decide how to involve them.
 

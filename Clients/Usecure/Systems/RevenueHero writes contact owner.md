@@ -40,3 +40,5 @@ RevenueHero stops writing contact owner; the deal takes its owner from the meeti
 which RevenueHero already stamps (populated on all 106 bookings since launch).
 
 Agreed in principle by Jordan and Scott, 19 August. Scott now owns RevenueHero.
+
+- [ ] Get the router change made with Scott 📅 2026-08-25

@@ -24,6 +24,8 @@ contact an hour later notifies its owner; the historic tail sits in review lists
 
 4 new-business deals since launch have been caught and are still unfixed.
 
+- [ ] Decide whether to extend the failsafe to renewals 📅 2026-08-29
+
 > [!warning] Renewals are not covered by the failsafe
 > Only new business triggers the notification, so renewals quietly accumulate the same
 > problem. 9 new contactless renewals appeared between 12 and 19 August.

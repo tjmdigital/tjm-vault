@@ -30,6 +30,10 @@ See [[2026-08-19 Backlog close]] for the same bug caught live.
 
 ## Before it can go live
 
+- [ ] Set the notification recipient on the warning step in the HubSpot UI - cannot be done via API 📅 2026-08-22
+- [ ] Switch the ladder on once Nihil confirms 📅 2026-08-26
+
+
 - [ ] Notification recipient set in the UI - cannot be done via API, and the step fires
       into nothing until it is. See [[Notification recipients cannot be set via API]].
 - [ ] Molly's answer on [[2026-08-20 Albir deactivation]]
