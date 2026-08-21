@@ -15,3 +15,5 @@ Copies the self-declared Direct/MSP answer from the contact onto the lead.
 
 Backfilled across 12,512 leads. Blank means the form did not ask - which was 11% of leads
 until Scott added the question to the remaining forms on 19 August, now 4%.
+
+    Part of [[Direct and MSP split]].

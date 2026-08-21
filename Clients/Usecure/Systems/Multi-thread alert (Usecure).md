@@ -10,7 +10,7 @@ blocked_on: "review the build before switching on - nothing upstream of it"
 since: 2026-08-21
 verified: 2026-08-21
 ---
-# Multi-thread alert
+# Multi-thread alert (Usecure)
 
 Agreed **June 2026**, built **21 August 2026**. Two months in which sales raised the same
 complaint twice in the channel - the clearest example of an agreed thing quietly not
@@ -20,3 +20,5 @@ New contact converts at a company with an open deal, no lead is created, and a t
 with the deal owner to decide how to involve them.
 
 Workflows: [[1870371127 Multi-thread flag]], [[1870335105 Multi-thread alert]]
+
+Uses [[trigger_multithread_alert]] to cross from contact to deal.

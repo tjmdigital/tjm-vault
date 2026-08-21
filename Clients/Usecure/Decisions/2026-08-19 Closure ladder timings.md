@@ -27,4 +27,4 @@ directly. **The fix was quoting, not explaining.**
 
 ## In the build
 
-Warning at day 2, reassignment day 3, close day 14. See [[Stale lead ladder]].
+Warning at day 2, reassignment day 3, close day 14. See [[Stale lead ladder (Usecure)]].

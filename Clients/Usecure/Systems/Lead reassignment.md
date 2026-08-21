@@ -5,7 +5,7 @@ pattern: "[[Two-stage trigger]]"
 variant: "company-level move, open-deal guard, one handover then close"
 enabled: false
 built: 2026-08-21
-blocked_by: "[[Stale lead ladder]]"
+blocked_by: "[[Stale lead ladder (Usecure)]]"
 blocked_on: "goes live with the ladder"
 since: 2026-08-21
 verified: 2026-08-21
@@ -39,3 +39,6 @@ Tor, Johanna, Aira Mae, Molly, Scott -> Molly.
 > See [[Deactivated users do not leave rotation pools]].
 
 Workflow: [[1870325562 Lead reassignment]]
+
+Ownership then propagates through the [[Owner sync chain]], which is enforced by
+[[1808815487 Update open deal owners 1 of 2]] and [[1808815387 Update open deal owners 2 of 2]].

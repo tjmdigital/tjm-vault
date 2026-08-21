@@ -15,7 +15,7 @@ Warn day 2, stamp reassignment trigger day 3, close day 14.
 
 Un-enrols on any activity. Enrolment guarded to leads older than 2 days.
 
-Implements [[Stale lead ladder]].
+Implements [[Stale lead ladder (Usecure)]].
 
 > [!warning] Notification step has no recipient
 > Must be set in the UI before switch-on.

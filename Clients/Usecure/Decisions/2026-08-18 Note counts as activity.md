@@ -17,4 +17,4 @@ Nobody gets chased for a decision they have already made and recorded.
 The warning email now asks the owner to close it properly with a reason rather than let it
 time out, because that feedback is worth more than an automatic close.
 
-Both in [[Stale lead ladder]].
+Both in [[Stale lead ladder (Usecure)]].

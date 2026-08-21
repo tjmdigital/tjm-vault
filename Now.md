@@ -13,7 +13,9 @@ themselves. If a row looks wrong, the note behind it is wrong.
 
 ## With other people
 
-Names are links - open one to see everything sitting with that person.
+Names are links - open one to see everything sitting with that person. Unsettled decisions
+appear here too: a decision note with `status: open` and a `waiting_on` is the open question,
+and becomes the permanent record once it is answered.
 
 ```dataview
 TABLE WITHOUT ID
@@ -71,19 +73,6 @@ TABLE WITHOUT ID
 FROM "Clients"
 WHERE blocked_by
 SORT built ASC
-```
-
-## Open questions
-
-```dataview
-TABLE WITHOUT ID
-  link(file.link, file.name) AS "Question",
-  client,
-  waiting_on AS "With",
-  date AS "raised"
-FROM "Clients"
-WHERE type = "decision" AND status = "open"
-SORT date ASC
 ```
 
 ## Stale claims

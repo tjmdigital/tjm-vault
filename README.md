@@ -18,13 +18,23 @@ dashboard surfaces anything that has gone stale. The vault nags; you do not have
 |---|---|
 | `Platform/` | Client-agnostic facts about HubSpot. API gotchas, limits, behaviour. |
 | `Patterns/` | Reusable mechanisms. Each one lists every client that has an implementation. |
-| `Clients/<name>/` | One folder per client: Metrics, Systems, Decisions, HubSpot, Checks, People. |
+| `Clients/<name>/` | One folder per client: Systems, Metrics, Decisions, HubSpot, Checks, Meetings, People. |
 | `Templates/` | Note templates. Use them - the frontmatter is what makes the queries work. |
 
-## Two pages to know
+## Pages to know
 
 - **[[Now]]** - what is stuck, on whom, and for how long. Derived, never maintained by hand.
 - **[[00 Dashboard]]** - the wider view: freshness, hardcoded people, pattern reuse.
+- **[[Patterns]]** - reusable mechanisms and where each is built.
+- **[[Platform]]** - API facts and gotchas. Check before trial and error.
+- **[[Usecure]]** - the client index.
+
+## Naming
+
+Where a client's implementation shares a name with its pattern, the client note takes a
+suffix: `Stale lead ladder` is the pattern, `Stale lead ladder (Usecure)` is the build.
+Obsidian resolves wikilinks by filename alone, so two notes with the same name make every
+link to either of them ambiguous.
 
 Tasks with due dates live in Notion, not here. This vault holds the state of the world;
 Notion holds what you have to do about it.

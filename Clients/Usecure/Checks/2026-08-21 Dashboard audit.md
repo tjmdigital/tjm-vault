@@ -22,6 +22,8 @@ year's 2,837 leads including 1,532 that reached Attempting. The rates shown are 
 414 survivors and flatter the process. Should be re-cohorted to 21 July onwards with the
 exclusion dropped.
 
+Verifies [[Picked up and worked]] and [[Any movement out of New]].
+
 ## Cannot be fixed from here
 
 HubSpot has **no public API for editing report filters** - the dashboard endpoints 404 or

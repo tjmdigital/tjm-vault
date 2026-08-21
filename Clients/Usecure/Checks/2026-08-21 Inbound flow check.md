@@ -12,7 +12,7 @@ outcome: healthy
 | Leads | 318 | 89 |
 | Qualified | 96 | 21 |
 
-Busiest week since launch.
+Busiest week since launch. Figures behind these: [[Conversions]], [[Qualified]], [[Open leads]].
 
 - Unowned leads down to **2** (was 13 on 18 August)
 - 4 new-business deals since launch missing a contact - failsafe catching them

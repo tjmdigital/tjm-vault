@@ -5,7 +5,7 @@ pattern: "[[Fallback routing for unowned records]]"
 variant: "1 hour grace, rotate UK SDRs, copy owner to company"
 enabled: false
 built: 2026-08-21
-blocked_by: "[[Stale lead ladder]]"
+blocked_by: "[[Stale lead ladder (Usecure)]]"
 blocked_on: "goes live with the ladder"
 since: 2026-08-21
 verified: 2026-08-21
@@ -27,3 +27,5 @@ Built as a separate pair rather than editing the live master allocation workflow
 nothing about current routing changes.
 
 Workflows: [[1870368615 Unowned lead flag]], [[1870371119 Unowned lead fallback]]
+
+Uses [[trigger_unowned_lead_routing]] to cross from lead to contact.

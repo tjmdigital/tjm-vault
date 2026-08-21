@@ -13,4 +13,4 @@ hardcodes: []
 
 New conversion at a company with an open deal stamps the company.
 
-Implements [[Multi-thread alert]].
+Implements [[Multi-thread alert (Usecure)]].

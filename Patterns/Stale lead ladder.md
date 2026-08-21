@@ -37,7 +37,7 @@ Every client argues about these, so ask early:
 
 - **The backlog must be handled separately from the rule.** Switching on with 700 stale
   leads means 700 notifications at once. Close them as a line in the sand, keep the list
-  for re-engagement. See [[Backlog close]].
+  for re-engagement. See [[2026-08-19 Backlog close]].
 - **Reassignment moves more than the lead.** Because of the [[Owner sync chain]],
   rotating a lead moves company ownership and drags open deals with it. Needs a guard.
 - **Never-touched and gone-quiet are different cases.** A lead nobody ever opened does not

@@ -1,5 +1,5 @@
 ---
-type: system
+type: issue
 client: Usecure
 status: open
 waiting_on: ["[[Scott Pointon]]"]

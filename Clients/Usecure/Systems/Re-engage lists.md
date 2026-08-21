@@ -20,3 +20,6 @@ MSP contacts who enquired since Jan 2025 and never bought.
 Suppression rules added 20 August at Scott's request - see
 [[2026-08-20 Suppress recently contacted and sequenced]]. That removed 80 from the main
 list and 33 from NFR. Overlap between send lists and suppression verified at zero.
+
+Building these surfaced two API behaviours worth remembering:
+[[List API constraints]] and [[Association type IDs worth knowing]].

@@ -23,7 +23,7 @@ He holds **1,237 companies, 2,157 contacts, 35 open leads, 185 open deals**. Bec
 [[Owner sync chain]], any new enquiry at one of those companies keeps landing on him until
 they move.
 
-Blocks [[Stale lead ladder]] going live: once it runs, his stale leads start rotating away
+Blocks [[Stale lead ladder (Usecure)]] going live: once it runs, his stale leads start rotating away
 by themselves, which may pre-empt Molly's decision.
 
 ## Also found
@@ -41,7 +41,7 @@ Molly:
 > Nihil is reallocating some leads with his team and then I will instruct my team with
 > reassigned leads."
 
-So his records stay frozen. To stop that blocking [[Stale lead ladder]] entirely, the ladder
+So his records stay frozen. To stop that blocking [[Stale lead ladder (Usecure)]] entirely, the ladder
 enrolment now **excludes leads owned by Albir**. Everything else can be governed from switch-on;
 his 30 stale leads sit untouched until she is back.
 

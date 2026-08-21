@@ -11,7 +11,7 @@ since: 2026-08-21
 verified: 2026-08-21
 hardcodes: [Albir]
 ---
-# Stale lead ladder
+# Stale lead ladder (Usecure)
 
 ## As built
 
@@ -35,3 +35,5 @@ See [[2026-08-19 Backlog close]] for the same bug caught live.
 - [ ] Molly's answer on [[2026-08-20 Albir deactivation]]
 
 Workflow: [[1868268934 Lead stale ladder]]
+
+Built against [[Lead create date is hs_createdate]] - the lead object does not use `createdate`.
