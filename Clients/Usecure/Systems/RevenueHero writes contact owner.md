@@ -2,7 +2,7 @@
 type: system
 client: Usecure
 status: open
-waiting_on: Scott Pointon
+waiting_on: ["[[Scott Pointon]]"]
 blocked_on: "Scott to make the router change now he owns RevenueHero"
 since: 2026-08-19
 verified: 2026-08-21

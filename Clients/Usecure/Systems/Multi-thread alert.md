@@ -5,8 +5,8 @@ pattern: "[[Multi-thread alert]]"
 variant: "task to the deal owner, no second lead"
 enabled: false
 built: 2026-08-21
-blocked_on: "review before switch-on"
-waiting_on: Tom Mitchell
+waiting_on: ["[[Tom Mitchell]]"]
+blocked_on: "review the build before switching on - nothing upstream of it"
 since: 2026-08-21
 verified: 2026-08-21
 ---

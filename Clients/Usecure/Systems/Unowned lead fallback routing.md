@@ -5,8 +5,8 @@ pattern: "[[Fallback routing for unowned records]]"
 variant: "1 hour grace, rotate UK SDRs, copy owner to company"
 enabled: false
 built: 2026-08-21
+blocked_by: "[[Stale lead ladder]]"
 blocked_on: "goes live with the ladder"
-waiting_on: Tom Mitchell
 since: 2026-08-21
 verified: 2026-08-21
 hardcodes: [Dominic, AJ]

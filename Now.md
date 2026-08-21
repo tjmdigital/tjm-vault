@@ -3,15 +3,17 @@ tags: [index]
 ---
 # Now
 
-Everything not moving, and who it is sitting with. **Nothing here is maintained by hand** -
-it reads `waiting_on`, `blocked_on` and `since` off the notes themselves. If something is
-wrong here, fix it on the note.
+What is stuck, who it is sitting with, and for how long. **Nothing here is maintained by
+hand** - it reads `waiting_on`, `blocked_by`, `blocked_on` and `since` off the notes
+themselves. If a row looks wrong, the note behind it is wrong.
 
-> [!info] This is not a task list
-> Things you have to *do* live in Notion, with due dates and ticks. This page answers a
-> different question: what is stuck, on whom, and for how long.
+> [!info] Not a task list
+> Things you have to *do*, with due dates and ticks, live in Notion. This page answers a
+> different question: what is stuck and on whom.
 
-## Waiting on other people
+## With other people
+
+Names are links - open one to see everything sitting with that person.
 
 ```dataview
 TABLE WITHOUT ID
@@ -20,11 +22,13 @@ TABLE WITHOUT ID
   blocked_on AS "Needs",
   (date(today) - date(since)).days AS "days"
 FROM "Clients"
-WHERE waiting_on AND waiting_on != "Tom Mitchell"
+WHERE waiting_on AND !contains(string(waiting_on), "Tom Mitchell")
 SORT since ASC
 ```
 
-## Waiting on me
+## With me
+
+Only things where I am the blocker and nothing upstream is holding them.
 
 ```dataview
 TABLE WITHOUT ID
@@ -32,26 +36,44 @@ TABLE WITHOUT ID
   blocked_on AS "Needs",
   (date(today) - date(since)).days AS "days"
 FROM "Clients"
-WHERE waiting_on = "Tom Mitchell"
+WHERE contains(string(waiting_on), "Tom Mitchell")
+  AND !blocked_by
+  AND length(waiting_on) = 1
 SORT since ASC
 ```
 
-## Built but not live
+## With me, but also someone else
+
+Part mine, part theirs. Doing my half does not unblock it on its own.
 
 ```dataview
 TABLE WITHOUT ID
   link(file.link, file.name) AS "Item",
-  client,
+  filter(waiting_on, (p) => !contains(string(p), "Tom Mitchell")) AS "Also with",
   blocked_on AS "Needs",
+  (date(today) - date(since)).days AS "days"
+FROM "Clients"
+WHERE contains(string(waiting_on), "Tom Mitchell")
+  AND length(waiting_on) > 1
+SORT since ASC
+```
+
+## Downstream
+
+Built and ready, waiting on something else in the chain rather than on a person. These
+free themselves - no action needed.
+
+```dataview
+TABLE WITHOUT ID
+  link(file.link, file.name) AS "Item",
+  blocked_by AS "Waiting for",
   built AS "built"
 FROM "Clients"
-WHERE enabled = false AND type = "system"
+WHERE blocked_by
 SORT built ASC
 ```
 
 ## Open questions
-
-Decisions raised but not settled.
 
 ```dataview
 TABLE WITHOUT ID

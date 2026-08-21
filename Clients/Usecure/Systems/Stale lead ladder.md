@@ -5,8 +5,8 @@ pattern: "[[Stale lead ladder]]"
 variant: "2/3/14, single-person pools route to Molly, note counts as activity"
 enabled: false
 built: 2026-08-17
-blocked_on: "notification recipient must be set in the HubSpot UI"
-waiting_on: Nihil Morjaria
+waiting_on: ["[[Nihil Morjaria]]", "[[Tom Mitchell]]"]
+blocked_on: "Nihil to confirm the open-deal guard; notification recipient still to be set in the HubSpot UI"
 since: 2026-08-21
 verified: 2026-08-21
 hardcodes: [Albir]

@@ -5,8 +5,9 @@ pattern:
 variant:
 enabled:
 built:
-blocked_on:
 waiting_on:
+blocked_by:
+blocked_on:
 since:
 verified:
 hardcodes: []
