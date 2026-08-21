@@ -5,8 +5,8 @@ pattern: "[[Stale lead ladder]]"
 variant: "2/3/14, single-person pools route to Molly, note counts as activity"
 enabled: false
 built: 2026-08-17
-waiting_on: ["[[Nihil Morjaria]]", "[[Tom Mitchell]]"]
-blocked_on: "Nihil to confirm the open-deal guard; notification recipient still to be set in the HubSpot UI"
+waiting_on: ["[[Tom Mitchell]]"]
+blocked_on: "notification recipient to be set in the HubSpot UI, then agree a go-live date with the team"
 since: 2026-08-21
 verified: 2026-08-21
 hardcodes: [Albir]
@@ -34,9 +34,6 @@ See [[2026-08-19 Backlog close]] for the same bug caught live.
 - [ ] Switch the ladder on once Nihil confirms 📅 2026-08-26
 
 
-- [ ] Notification recipient set in the UI - cannot be done via API, and the step fires
-      into nothing until it is. See [[Notification recipients cannot be set via API]].
-- [ ] Molly's answer on [[2026-08-20 Albir deactivation]]
 
 Workflow: [[1868268934 Lead stale ladder]]
 
