@@ -5,7 +5,7 @@ pattern: "[[Two-stage trigger]]"
 variant: "company-level move, open-deal guard, one handover then close"
 enabled: false
 built: 2026-08-21
-blocked_on: "Molly's decision on Albir's records"
+blocked_on: "goes live with the ladder"
 verified: 2026-08-21
 hardcodes: [Dominic, AJ, Alex Campbell, Alex Legeay, Gerson, Molly]
 ---
