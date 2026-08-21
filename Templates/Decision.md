@@ -4,6 +4,9 @@ client:
 date:
 decided_by:
 status: settled
+waiting_on:
+blocked_on:
+since:
 source:
 supersedes:
 ---

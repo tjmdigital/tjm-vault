@@ -5,7 +5,9 @@ pattern: "[[Stale lead ladder]]"
 variant: "2/3/14, single-person pools route to Molly, note counts as activity"
 enabled: false
 built: 2026-08-17
-blocked_on: "notification recipient set in UI + Nihil to confirm"
+blocked_on: "notification recipient must be set in the HubSpot UI"
+waiting_on: Nihil Morjaria
+since: 2026-08-21
 verified: 2026-08-21
 hardcodes: [Albir]
 ---

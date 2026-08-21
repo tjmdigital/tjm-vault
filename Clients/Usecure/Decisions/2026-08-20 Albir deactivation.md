@@ -3,7 +3,9 @@ type: decision
 client: Usecure
 date: 2026-08-20
 status: open
-waiting_on: "Molly McManamon (back from India w/c 25 Aug)"
+waiting_on: Molly McManamon
+blocked_on: "where Albir's 1,235 companies and 35 open leads should go - Molly back w/c 25 Aug"
+since: 2026-08-20
 ---
 # Where do Albir's records go
 

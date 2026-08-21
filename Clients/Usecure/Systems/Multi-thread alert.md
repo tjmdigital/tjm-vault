@@ -6,6 +6,8 @@ variant: "task to the deal owner, no second lead"
 enabled: false
 built: 2026-08-21
 blocked_on: "review before switch-on"
+waiting_on: Tom Mitchell
+since: 2026-08-21
 verified: 2026-08-21
 ---
 # Multi-thread alert

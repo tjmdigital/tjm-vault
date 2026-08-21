@@ -21,6 +21,14 @@ dashboard surfaces anything that has gone stale. The vault nags; you do not have
 | `Clients/<name>/` | One folder per client: Metrics, Systems, Decisions, HubSpot, Checks, People. |
 | `Templates/` | Note templates. Use them - the frontmatter is what makes the queries work. |
 
+## Two pages to know
+
+- **[[Now]]** - what is stuck, on whom, and for how long. Derived, never maintained by hand.
+- **[[00 Dashboard]]** - the wider view: freshness, hardcoded people, pattern reuse.
+
+Tasks with due dates live in Notion, not here. This vault holds the state of the world;
+Notion holds what you have to do about it.
+
 ## The one rule
 
 A client `System` note must declare `pattern:` in its frontmatter. That single field is

@@ -6,6 +6,8 @@ variant:
 enabled:
 built:
 blocked_on:
+waiting_on:
+since:
 verified:
 hardcodes: []
 ---

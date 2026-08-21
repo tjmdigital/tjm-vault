@@ -6,7 +6,10 @@ launched: 2026-07-21
 ---
 # Usecure
 
-Human Risk Management platform. RevOps and HubSpot work via ToJupiter.
+Human Risk Management platform. RevOps and HubSpot work, direct with usecure.
+
+Originally engaged via ToJupiter; that agency is no longer involved as of August 2026, so
+no ToJupiter-facing reporting is needed.
 New inbound lead process launched **21 July 2026**.
 
 > [!warning] There are two API tokens in this portal

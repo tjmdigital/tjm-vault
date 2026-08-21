@@ -3,6 +3,8 @@ tags: [index]
 ---
 # Dashboard
 
+**[[Now]]** - what is stuck and on whom. Start there most days; this page is the wider view.
+
 ## Everything, by age
 
 Oldest at the top. This is the one to glance at - anything drifting down the list is
@@ -26,17 +28,6 @@ WHERE verified AND (date(today) - date(verified)).days > 14
 SORT verified ASC
 ```
 
-## Built but switched off
-
-Each of these should have a blocker and a named person.
-
-```dataview
-TABLE client, blocked_on, built
-FROM "Clients"
-WHERE enabled = false
-SORT built ASC
-```
-
 ## Anything hardcoding a person
 
 The Albir question: if someone leaves tomorrow, what breaks silently?
@@ -46,15 +37,6 @@ TABLE client, hardcodes, enabled
 FROM "Clients"
 WHERE hardcodes AND length(hardcodes) > 0
 SORT client ASC
-```
-
-## Waiting on someone
-
-```dataview
-TABLE client, waiting_on, date
-FROM "Clients"
-WHERE status = "open"
-SORT date ASC
 ```
 
 ## Patterns by reuse
