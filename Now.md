@@ -5,7 +5,11 @@ tags: [index]
 
 What is stuck, who it is sitting with, and for how long. **Nothing here is maintained by
 hand** - it reads `waiting_on`, `blocked_by`, `blocked_on` and `since` off the notes
-themselves. If a row looks wrong, the note behind it is wrong.
+themselves, wherever they live. If a row looks wrong, the note behind it is wrong.
+
+The four blocked sections are mutually exclusive by construction: anything with `blocked_by`
+appears only under Downstream, and `waiting_on` decides which of the other three. Stale claims
+is a separate axis - a note can be both stuck and out of date, and you would want to know both.
 
 > [!info] Not a task list
 > Things you have to *do*, with due dates and ticks, live in Notion. This page answers a
@@ -24,7 +28,9 @@ TABLE WITHOUT ID
   blocked_on AS "Needs",
   (date(today) - date(since)).days AS "days"
 FROM "Clients"
-WHERE waiting_on AND !contains(string(waiting_on), "Tom Mitchell")
+WHERE waiting_on
+  AND !contains(string(waiting_on), "Tom Mitchell")
+  AND !blocked_by
 SORT since ASC
 ```
 
@@ -57,6 +63,7 @@ TABLE WITHOUT ID
 FROM "Clients"
 WHERE contains(string(waiting_on), "Tom Mitchell")
   AND length(waiting_on) > 1
+  AND !blocked_by
 SORT since ASC
 ```
 
@@ -69,6 +76,7 @@ free themselves - no action needed.
 TABLE WITHOUT ID
   link(file.link, file.name) AS "Item",
   blocked_by AS "Waiting for",
+  choice(waiting_on, waiting_on, "-") AS "Then with",
   built AS "built"
 FROM "Clients"
 WHERE blocked_by
