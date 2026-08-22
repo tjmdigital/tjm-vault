@@ -77,37 +77,42 @@ def current_labels(c, event_id):
         if not after: return cur
 
 
-def checks(c):
-    out, repairable = [], []
+from lib import Registry
 
-    # workflow state drift - the vault says one thing, HubSpot another
+check = Registry()
+
+
+@check("Workflow state matches the vault")
+def _drift(c):
+    out = []
     for path in c.notes("HubSpot"):
         f = c.frontmatter(path)
         wid, want = f.get("hubspot_id"), f.get("enabled")
         if not wid or want not in ("true", "false"): continue
-        try:
-            live = c.api(f"/automation/v4/flows/{wid}").get("isEnabled")
-        except Exception:
-            out.append(("workflow", f"{wid} could not be read")); continue
+        live = c.api(f"/automation/v4/flows/{wid}").get("isEnabled")
         if str(live).lower() != want:
-            out.append(("drift", f"{path.split('/')[-1][:-3]} is "
-                                 f"{'ON' if live else 'OFF'} in HubSpot, vault says {want}"))
+            out.append(f"{path.split('/')[-1][:-3]} is {'ON' if live else 'OFF'} in HubSpot, "
+                       f"vault says {want}")
+    return out
 
+
+@check("Every open lead has an owner")
+def _unowned(c):
     n = c.count("0-136", [[OPEN, LIVE,
                            {"propertyName": "hubspot_owner_id", "operator": "NOT_HAS_PROPERTY"}]])
-    if n: out.append(("unowned", f"{n} open lead(s) with no owner"))
+    return [f"{n} open lead(s) with no owner"] if n else []
 
-    # leavers. The company backlog is known and old, so it gets one summary line;
-    # open leads and open deals with a dead owner are the actionable part.
+
+@check("No live work sitting with a deactivated user")
+def _leavers(c):
+    out, who, deals, backlog, people = [], [], 0, 0, 0
     _, gone = c.owners()
-    deals = detail = 0
-    who, backlog, people = [], 0, 0
     for o in gone:
         nm = (o.get("firstName", "") + " " + o.get("lastName", "")).strip() or o.get("email")
         oid = o["id"]
         n = c.count("0-136", [[OPEN, LIVE, {"propertyName": "hubspot_owner_id",
                                             "operator": "EQ", "value": oid}]])
-        if n: out.append(("leaver", f"{n} open lead(s) still owned by {nm}, deactivated"))
+        if n: out.append(f"{n} open lead(s) still owned by {nm}, deactivated")
         d = c.count("deals", [[{"propertyName": "hubspot_owner_id", "operator": "EQ", "value": oid},
                                {"propertyName": "hs_is_closed", "operator": "EQ", "value": "false"}]])
         if d: deals += d; who.append((nm, d))
@@ -115,57 +120,74 @@ def checks(c):
                                      "operator": "EQ", "value": oid}]])
         if co: backlog += co; people += 1
     if deals:
-        out.append(("leaver deals", f"{deals} open deal(s) held by {len(who)} deactivated users"))
+        out.append(f"{deals} open deal(s) held by {len(who)} deactivated users")
         c.note("Open deals by deactivated owner: " +
                ", ".join(f"{n} ({d})" for n, d in sorted(who, key=lambda x: -x[1])))
     if backlog:
-        out.append(("backlog", f"{backlog:,} companies owned by {people} deactivated "
-                               f"users - known backlog, not new"))
+        out.append(f"{backlog:,} companies owned by {people} deactivated users - "
+                   f"known backlog, not new")
+    return out
 
+
+@check("New business deals have a contact attached")
+def _deal_contacts(c):
     n = c.count("deals", [[{"propertyName": "createdate", "operator": "GTE", "value": LAUNCH},
                            {"propertyName": "pipeline", "operator": "EQ", "value": "default"},
                            {"propertyName": "num_associated_contacts", "operator": "EQ", "value": "0"}]])
-    if n: out.append(("deals", f"{n} new-business deal(s) since launch with no contact"))
+    return [f"{n} new-business deal(s) since launch with no contact"] if n else []
 
+
+@check("Two-stage triggers have all cleared")
+def _triggers(c):
+    out = []
     for prop, obj in (("trigger_lead_reassignment", "companies"),
                       ("trigger_multithread_alert", "companies"),
                       ("trigger_unowned_lead_routing", "contacts")):
-        try:
-            n = c.count(obj, [[{"propertyName": prop, "operator": "HAS_PROPERTY"}]])
-        except Exception: continue
-        if n: out.append(("stuck trigger",
-                          f"{n} {obj[:-1]} record(s) with {prop} set - second workflow did not run"))
+        n = c.count(obj, [[{"propertyName": prop, "operator": "HAS_PROPERTY"}]])
+        if n: out.append(f"{n} {obj[:-1]} record(s) with {prop} still set - "
+                         f"the second workflow did not run")
+    return out
 
-    # events. Compare against the participation records, never against the marketing
-    # event's registrants/attendees fields - those are integration counters and run high.
+
+def _marketing_events(c):
     me, after = [], None
     while True:
         u = "/marketing/v3/marketing-events/?limit=100" + (f"&after={after}" if after else "")
-        try: r = c.api(u)
-        except Exception: break
+        r = c.api(u)
         me += r.get("results", [])
         after = r.get("paging", {}).get("next", {}).get("after")
-        if not after: break
-    events = c.page("0-162", ["hs_name", "marketing_event_id",
-                              "total_registrations", "total_attendees"])
-    linked = {e["properties"].get("marketing_event_id"): e for e in events
-              if e["properties"].get("marketing_event_id")}
+        if not after: return me
 
+
+@check("Every marketing event has an event record")
+def _event_records(c):
+    me = _marketing_events(c)
+    linked = {e["properties"].get("marketing_event_id")
+              for e in c.page("0-162", ["marketing_event_id"])
+              if e["properties"].get("marketing_event_id")}
     orphaned = [m for m in me if str(m.get("objectId")) not in linked
                 and ((m.get("registrants") or 0) > 0 or (m.get("attendees") or 0) > 0)]
-    if orphaned:
-        out.append(("events", f"{len(orphaned)} marketing event(s) with people but no event "
-                              f"record - invisible to attribution"))
-        for m in orphaned[:10]:
-            c.note(f"No event record: {m.get('eventName','')[:60]}")
+    for m in orphaned[:10]:
+        c.note(f"No event record: {m.get('eventName','')[:60]}")
+    return ([f"{len(orphaned)} marketing event(s) with people but no event record - "
+             f"invisible to attribution"] if orphaned else [])
 
+
+@check("Registrants and attendees are in sync", repairs=True)
+def _event_sync(c):
+    """Compared against the participation records, never the marketing event's
+    registrants/attendees fields - those are integration counters and run 1-2 high."""
+    out, repairable = [], []
+    events = c.page("0-162", ["hs_name", "marketing_event_id",
+                              "total_registrations", "total_attendees"])
     sr = sa = sn = 0
-    for mid, e in linked.items():
+    for e in events:
         p = e["properties"]
+        mid = p.get("marketing_event_id")
+        if not mid: continue
         tr = int(float(p.get("total_registrations") or 0))
         ta = int(float(p.get("total_attendees") or 0))
-        try: want = wanted_labels(c, mid)
-        except Exception: continue
+        want = wanted_labels(c, mid)
         wr = len(want)
         wa = sum(1 for v in want.values() if LBL_ATT in v)
         if wr > tr or wa > ta:
@@ -173,8 +195,7 @@ def checks(c):
             repairable.append((e["id"], mid, p.get("hs_name", "")))
             c.note(f"Short on {p.get('hs_name','')[:52]}: {tr}/{wr} registered, {ta}/{wa} attended")
     if sn:
-        out.append(("events", f"{sn} event(s) out of sync - {sr} registrant(s) and "
-                              f"{sa} attendee(s) missing"))
+        out.append(f"{sn} event(s) out of sync - {sr} registrant(s) and {sa} attendee(s) missing")
     return out, repairable
 
 

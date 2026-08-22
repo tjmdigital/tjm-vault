@@ -20,13 +20,25 @@ Run by `scripts/run.py`. The metric notes below were updated in place.
 | [[Open leads]] | 259 | - |
 | [[Net new event contacts]] | 1249 | - |
 
-## Findings
+## Checks
 
-- **unowned** - 2 open lead(s) with no owner
-- **leaver** - 34 open lead(s) still owned by Albir Gendi, deactivated
-- **leaver deals** - 801 open deal(s) held by 7 deactivated users
-- **backlog** - 21,711 companies owned by 21 deactivated users - known backlog, not new
-- **deals** - 4 new-business deal(s) since launch with no contact
+| Check | Result |
+|---|---|
+| Workflow state matches the vault | pass |
+| Every open lead has an owner | **1 finding(s)** |
+| No live work sitting with a deactivated user | **3 finding(s)** |
+| New business deals have a contact attached | **1 finding(s)** |
+| Two-stage triggers have all cleared | pass |
+| Every marketing event has an event record | pass |
+| Registrants and attendees are in sync | pass |
+
+### Findings
+
+- **Every open lead has an owner** - 2 open lead(s) with no owner
+- **No live work sitting with a deactivated user** - 34 open lead(s) still owned by Albir Gendi, deactivated
+- **No live work sitting with a deactivated user** - 801 open deal(s) held by 7 deactivated users
+- **No live work sitting with a deactivated user** - 21,711 companies owned by 21 deactivated users - known backlog, not new
+- **New business deals have a contact attached** - 4 new-business deal(s) since launch with no contact
 
 ## Detail
 

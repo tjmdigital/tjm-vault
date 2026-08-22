@@ -46,34 +46,42 @@ def run(mod_name, fix=False):
         if old: moved[k] = old
     missing = [k for k, v in moved.items() if v == "MISSING"]
 
-    findings, repairable = mod.checks(c)
+    results, findings, repairable = mod.check.run(c)
 
     if fix and repairable and hasattr(mod, "repair"):
         tr = ta = 0; failures = []
-        for target in repairable:
+        for _name, target in repairable:
             r, a, f = mod.repair(c, target)
             tr += r; ta += a; failures += f
             if r or a: c.note(f"Repaired {target[2][:52]}: +{r} registered, +{a} attended")
         if tr or ta:
-            findings = [x for x in findings if not (x[0] == "events" and "out of sync" in x[1])]
-            findings.append(("repaired", f"{tr} registrant and {ta} attendee association(s) "
+            findings = [x for x in findings if "out of sync" not in x[1]]
+            results = [(n, "repaired" if "sync" in n else s_, e) for n, s_, e in results]
+            findings.append(("Repaired", f"{tr} registrant and {ta} attendee association(s) "
                                          f"across {len(repairable)} event(s)"))
         if failures:
-            findings.append(("repair failed", f"{len(failures)} could not be created"))
+            findings.append(("Repair failed", f"{len(failures)} could not be created"))
             for f in failures[:10]: c.note(f)
 
     lint_rc, lint_out = lib.run_lint()
-    lib.write_check(c, today, m, moved, findings, lint_out)
+    lib.write_check(c, today, m, moved, results, findings, lint_out)
 
-    clean = not findings and lint_rc == 0 and not missing
-    txt = f"{':white_check_mark:' if clean else ':warning:'} {label}\n{m.get('_headline','')}\n"
-    if clean:
-        txt += "All checks passed. Metric notes refreshed in the vault."
-    else:
-        for cat, msg in findings: txt += f"• {cat}: {msg}\n"
-        for k in missing: txt += f"• vault: no metric note for {k}\n"
-        if lint_rc == 1:
-            txt += f"• vault lint: {lint_out.splitlines()[0] if lint_out else 'problems found'}\n"
+    unknown = [n for n, s_, _ in results if s_ == "UNKNOWN"]
+    passed  = [n for n, s_, _ in results if s_ in ("pass", "repaired")]
+    clean = not findings and lint_rc == 0 and not missing and not unknown
+
+    icon = ":white_check_mark:" if clean else (":rotating_light:" if unknown else ":warning:")
+    txt = f"{icon} {label}\n{m.get('_headline','')}\n"
+    for cat, msg in findings: txt += f"• {cat}: {msg}\n"
+    for k in missing: txt += f"• Vault: no metric note for {k}\n"
+    if lint_rc == 1:
+        txt += f"• Vault lint: {lint_out.splitlines()[0] if lint_out else 'problems found'}\n"
+    for n in unknown:
+        txt += f"• :grey_question: {n} - could not run, result unknown not clear\n"
+    # always say what was checked, so a silent check is distinguishable from a clean one
+    txt += (f"_{len(passed)}/{len(results)} checks passed"
+            + (f", {len(unknown)} could not run" if unknown else "")
+            + f". Passed: {', '.join(passed)}._" if passed or unknown else "")
     lib.slack(txt.rstrip())
     print(txt)
     for k, v in m.items():

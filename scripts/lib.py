@@ -94,6 +94,40 @@ class Client:
         self.detail.append(msg)
 
 
+# ------------------------------------------------------------------ checks
+class Registry:
+    """Named checks. Each returns a list of finding strings, or [] if clean.
+
+    Adding a check is one decorated function - nothing else changes. Every check is
+    run independently, so one blowing up never hides the rest, and a check that
+    errors is reported as UNKNOWN rather than quietly counted as a pass.
+    """
+
+    def __init__(self):
+        self.checks = []
+
+    def __call__(self, name, repairs=False):
+        def deco(fn):
+            self.checks.append({"name": name, "fn": fn, "repairs": repairs})
+            return fn
+        return deco
+
+    def run(self, c):
+        results, findings, repairable = [], [], []
+        for ch in self.checks:
+            try:
+                got = ch["fn"](c)
+                if ch["repairs"]:
+                    got, targets = got
+                    repairable += [(ch["name"], t) for t in targets]
+                got = got or []
+                results.append((ch["name"], "findings" if got else "pass", len(got)))
+                findings += [(ch["name"], g) for g in got]
+            except Exception as e:
+                results.append((ch["name"], "UNKNOWN", str(e)[:120]))
+        return results, findings, repairable
+
+
 # ------------------------------------------------------------------ shared
 def run_lint():
     try:
@@ -105,7 +139,7 @@ def run_lint():
         return 2, f"lint could not run: {e}"
 
 
-def write_check(c, today, metrics, moved, findings, lint_out):
+def write_check(c, today, metrics, moved, results, findings, lint_out):
     d = os.path.join(c.folder, "Checks")
     os.makedirs(d, exist_ok=True)
     L = ["---", "type: check", f"client: {c.name}", f"date: {today}",
@@ -117,8 +151,13 @@ def write_check(c, today, metrics, moved, findings, lint_out):
         if k.startswith("_"): continue
         was = moved.get(k)
         L.append(f"| [[{k}]] | {v} | {was if was and was != 'MISSING' else '-'} |")
-    L += ["", "## Findings", ""]
-    L += [f"- **{cat}** - {msg}" for cat, msg in findings] or ["Every check passed."]
+    L += ["", "## Checks", "", "| Check | Result |", "|---|---|"]
+    for name, status, extra in results:
+        icon = {"pass": "pass", "findings": f"**{extra} finding(s)**",
+                "UNKNOWN": f"**could not run** - {extra}"}[status]
+        L.append(f"| {name} | {icon} |")
+    if findings:
+        L += ["", "### Findings", ""] + [f"- **{cat}** - {msg}" for cat, msg in findings]
     if c.detail:
         L += ["", "## Detail", ""] + [f"- {x}" for x in c.detail]
     L += ["", "## Vault lint", "", "```", lint_out or "clean", "```"]
