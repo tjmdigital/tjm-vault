@@ -1,7 +1,7 @@
 ---
 type: metric
 client: Usecure
-value: 1248
+value: 1249
 verified: 2026-08-22
 decays: 30
 filter: "event-contact association labelled Net new (typeId 23)"

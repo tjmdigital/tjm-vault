@@ -69,6 +69,20 @@ def metrics():
 
 # ---------------------------------------------------------------- integrity
 DETAIL = []
+OUT_OF_SYNC = []
+REG_STATES = ("REGISTERED", "ATTENDED", "NO_SHOW")
+LBL_REG, LBL_ATT = 14, 16
+
+def breakdown(mid):
+    recs, after = [], None
+    while True:
+        u = f"/marketing/v3/marketing-events/participations/{mid}/breakdown?limit=100"
+        if after: u += f"&after={after}"
+        r = api(u)
+        recs += r.get("results", [])
+        after = r.get("paging", {}).get("next", {}).get("after")
+        if not after: break
+    return recs
 
 def integrity():
     out = []
@@ -173,20 +187,33 @@ def integrity():
             DETAIL.append(f"No event record: {m.get('eventName','')[:60]} "
                           f"({m.get('registrants')} reg, {m.get('attendees')} att)")
 
+    # Compare against the participation records, NOT the marketing event's registrants
+    # and attendees fields. Those are counters the integration maintains and they sit
+    # 1-2 high - they double-count re-registrations and keep counts for merged records.
+    # Comparing against them reported a permanent phantom gap.
     short_r = short_a = short_n = 0
     for mid, e in linked.items():
-        m = next((x for x in me if str(x.get("objectId")) == mid), None)
-        if not m: continue
         p = e["properties"]
         tr = int(float(p.get("total_registrations") or 0))
         ta = int(float(p.get("total_attendees") or 0))
-        dr = (m.get("registrants") or 0) - tr
-        da = (m.get("attendees") or 0) - ta
+        try:
+            recs = breakdown(mid)
+        except Exception:
+            continue
+        want_r, want_a = set(), set()
+        for r in recs:
+            cid = str(r.get("associations", {}).get("contact", {}).get("contactId") or "")
+            st = r.get("properties", {}).get("attendanceState")
+            if not cid or st not in REG_STATES: continue   # CANCELLED excluded on purpose
+            want_r.add(cid)
+            if st == "ATTENDED": want_a.add(cid)
+        dr, da = len(want_r) - tr, len(want_a) - ta
         if dr > 0 or da > 0:
             short_n += 1; short_r += max(dr, 0); short_a += max(da, 0)
+            OUT_OF_SYNC.append((e["id"], mid, p.get("hs_name", "")))
             DETAIL.append(f"Short on {p.get('hs_name','')[:52]}: "
-                          f"{tr}/{m.get('registrants')} registrants, "
-                          f"{ta}/{m.get('attendees')} attendees")
+                          f"{tr}/{len(want_r)} registered, {ta}/{len(want_a)} attended")
+
     if short_n:
         out.append(("events", f"{short_n} event(s) out of sync with their marketing event - "
                               f"{short_r} registrant(s) and {short_a} attendee(s) missing"))
@@ -277,8 +304,69 @@ def slack(text):
     except Exception as e:
         print("slack post failed:", e, file=sys.stderr)
 
+
+# ------------------------------------------------------------------- repair
+def current_labels(event_id):
+    """contactId -> set of typeIds currently on the pair."""
+    cur, after = {}, None
+    while True:
+        u = f"/crm/v4/objects/0-162/{event_id}/associations/contacts?limit=500"
+        if after: u += f"&after={after}"
+        r = api(u)
+        for x in r.get("results", []):
+            cur.setdefault(str(x["toObjectId"]), set()).update(
+                t["typeId"] for t in x["associationTypes"] if t.get("label"))
+        after = r.get("paging", {}).get("next", {}).get("after")
+        if not after: break
+    return cur
+
+def repair_event(event_id, mid):
+    """Add missing Registered/Attended labels. Returns (added_reg, added_att, failed).
+
+    A v4 association PUT REPLACES the whole label set for a pair, so the desired set
+    must include everything that is already there - including the Net new label, or
+    it gets stripped. Learned the hard way.
+    """
+    recs = breakdown(mid)
+    want = {}
+    for r in recs:
+        cid = str(r.get("associations", {}).get("contact", {}).get("contactId") or "")
+        st = r.get("properties", {}).get("attendanceState")
+        if not cid or st not in REG_STATES: continue
+        want.setdefault(cid, set()).add(LBL_REG)
+        if st == "ATTENDED": want[cid].add(LBL_ATT)
+    cur = current_labels(event_id)
+    added_r = added_a = 0
+    failed = []
+    for cid, need in want.items():
+        have = cur.get(cid, set())
+        if need <= have: continue
+        merged = have | need                      # never drop an existing label
+        body = [{"associationCategory": "USER_DEFINED", "associationTypeId": t} for t in sorted(merged)]
+        try:
+            req = urllib.request.Request(
+                f"{B}/crm/v4/objects/0-162/{event_id}/associations/0-1/{cid}",
+                data=json.dumps(body).encode(), headers=H, method="PUT")
+            urllib.request.urlopen(req, timeout=30).read()
+            if LBL_REG in need - have: added_r += 1
+            if LBL_ATT in need - have: added_a += 1
+        except Exception as e:
+            failed.append(f"{cid}: {e}")
+    if (added_r or added_a):
+        try:  # nudge net new tagging and deal attribution to recompute
+            api(f"/crm/v3/objects/0-162/{event_id}")
+            req = urllib.request.Request(
+                f"{B}/crm/v3/objects/0-162/{event_id}",
+                data=json.dumps({"properties": {"run_deal_attribution": "true"}}).encode(),
+                headers=H, method="PATCH")
+            urllib.request.urlopen(req, timeout=30).read()
+        except Exception:
+            pass
+    return added_r, added_a, failed
+
 # ---------------------------------------------------------------- main
 def main():
+    global DETAIL
     if not TOKEN:
         print("USECURE_HUBSPOT_TOKEN is not set", file=sys.stderr); return 2
     today = datetime.date.today().isoformat()
@@ -297,6 +385,23 @@ def main():
     missing = [k for k, v in moved.items() if v == "MISSING"]
 
     findings = integrity()
+
+    repaired = None
+    if "--fix" in sys.argv and OUT_OF_SYNC:
+        tr = ta = 0; tf = []
+        for eid, mid, nm in OUT_OF_SYNC:
+            r, a, f = repair_event(eid, mid)
+            tr += r; ta += a; tf += f
+            if r or a: DETAIL.append(f"Repaired {nm[:52]}: +{r} registered, +{a} attended")
+        if tr or ta:
+            repaired = f"repaired {tr} registrant and {ta} attendee association(s) "\
+                       f"across {len(OUT_OF_SYNC)} event(s)"
+            findings = [f for f in findings if f[0] != "events" or "out of sync" not in f[1]]
+            findings.append(("repaired", repaired))
+        if tf:
+            findings.append(("repair failed", f"{len(tf)} association(s) could not be created"))
+            DETAIL += tf[:10]
+
     lint_rc, lint_out = run_lint()
     write_check(today, m, findings, moved, lint_rc, lint_out)
 
