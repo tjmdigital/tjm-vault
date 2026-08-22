@@ -1,7 +1,7 @@
 ---
 type: metric
 client: Usecure
-value: 816
+value: 817
 verified: 2026-08-22
 decays: 7
 filter: "object 0-420, hs_createdate >= 2026-07-21"
