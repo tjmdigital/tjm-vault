@@ -1,44 +1,48 @@
 # scripts
 
-Two checks that keep the vault honest. Both are plain Python 3, no dependencies.
+Health checks that keep the vault honest and current. Plain Python 3, no dependencies.
 
-## `checks.py` - re-verifies Usecure against HubSpot
-
-Pulls the live numbers, **writes them back** into `Clients/Usecure/Metrics/`
-(`value:` and `verified:`), runs integrity checks on the builds, and writes a dated
-note into `Clients/Usecure/Checks/`. Posts a summary to Slack if a webhook is set.
-
-What it checks beyond the numbers:
-
-- **Workflow state drift** - vault says a workflow is off, HubSpot says it is on
-- Open leads with no owner
-- Open leads owned by anyone who has been deactivated
-- New-business deals since launch with no contact attached
-- Two-stage trigger properties left set, which means a second workflow did not run
-- Event-deal links with no Sourced/Influenced label
+    python3 run.py usecure          read only
+    python3 run.py usecure --fix    repair what is safely repairable
+    python3 run.py --all            every client in clients/
 
 Exit 0 clean, 1 findings, 2 could not run.
 
-## `lint.py` - protects the conventions
+## Shape
 
-The derived views depend entirely on frontmatter being right, and a typo fails
-silently rather than loudly. This catches broken links, ambiguous filenames, orphans,
-missing `type`/`client`/`pattern`, `waiting_on` written as a bare string instead of a
-list of links, missing `since`, and anything past its `decays` window.
+| File | What it is |
+|---|---|
+| `run.py` | entry point - loads a client module, runs it, writes the note, posts to Slack |
+| `lib.py` | everything generic: HubSpot API, metric writeback, Check note, lint runner, Slack |
+| `lint.py` | vault conventions - client-agnostic, runs as part of every check |
+| `clients/<name>.py` | **only** what is true of that client: what to count, what to check |
 
-Exit 0 clean, 1 problems.
+A client module exports `NAME`, `TOKEN_ENV`, `metrics(c)` and `checks(c)`, and optionally
+`repair(c, target)`. Everything else is inherited, so a fix to the writeback logic lands
+for every client at once rather than in one copy of five.
+
+## Adding a client
+
+1. Copy `clients/usecure.py` and strip it back to that client's metrics and checks
+2. Set its token env var
+3. Make sure `Clients/<Name>/Metrics/` has a note per metric, named exactly as the key
+   returned by `metrics()` - that is how the writeback finds them
+4. `python3 run.py <name>`
+
+Metric notes that do not exist are reported rather than created silently, so a typo in a
+metric name shows up as a finding instead of disappearing.
+
+## What it writes
+
+- `value:` and `verified:` on each metric note
+- a dated note in `Clients/<Name>/Checks/`
+- with `--fix`, association labels in HubSpot - and it always reports what it repaired
+  rather than quietly tidying up, so an upstream fault stays visible
 
 ## Environment
 
-    USECURE_HUBSPOT_TOKEN    required by checks.py
-    USECURE_SLACK_WEBHOOK    optional - posts the summary to #usecure-revops
-    VAULT_PATH               defaults to the repo root
+    USECURE_HUBSPOT_TOKEN     per client, named in the client module
+    TJM_SLACK_WEBHOOK         monitoring channel
+    VAULT_PATH                defaults to the repo root
 
-Never commit either secret. `.gitignore` blocks `.env`.
-
-## Running them
-
-    cd ~/dev/tjm-vault
-    export USECURE_HUBSPOT_TOKEN=...
-    python3 scripts/checks.py
-    python3 scripts/lint.py
+Never commit either. `.gitignore` blocks `.env`.

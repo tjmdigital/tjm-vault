@@ -40,3 +40,6 @@ New deals link themselves as soon as they get a contact, via
 [[Missing-contact failsafe (Usecure)]] - a deal with no contact is invisible to all of this.
 
 Verified by [[2026-08-19 Event attribution health check]].
+
+Repairing missing associations is done by `scripts/checks.py --fix`, which has to work
+around [[Association PUT replaces the label set]].

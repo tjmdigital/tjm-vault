@@ -8,9 +8,10 @@ Exit 0 = clean, 1 = problems found.
 import os, re, sys, collections, datetime
 
 VAULT = os.environ.get("VAULT_PATH", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SKIP = (".git", ".obsidian", "Templates")
+SKIP = (".git", ".obsidian", "Templates", "scripts")
 TYPES = {"system","issue","metric","decision","workflow","property","check",
          "meeting","person","pattern","platform","client"}
+EXEMPT = ("00 ", "Now", "Today", "README", "Patterns/Patterns", "Platform/Platform")
 
 def notes():
     for root, dirs, files in os.walk(VAULT):
@@ -50,8 +51,7 @@ def main():
     for p in paths:
         f, s = fm(p)
         t = f.get("type")
-        base = os.path.basename(p)
-        if base in ("README.md",) or p.startswith(("00 ", "Now", "Today")): continue
+        if p.startswith(EXEMPT): continue
         if not t:
             problems.append(("no type", p)); continue
         if t not in TYPES:
@@ -81,7 +81,7 @@ def main():
                 problems.append(("bad date", f"{p} - verified: {v}"))
 
     for n, p in names.items():
-        if p.startswith(("00 ", "Now", "Today", "README")) or "/" not in p: continue
+        if p.startswith(EXEMPT) or "/" not in p: continue
         f, _ = fm(p)
         if f.get("automated") == "true": continue   # surfaced by Dataview, never linked
         if not inbound.get(n):
