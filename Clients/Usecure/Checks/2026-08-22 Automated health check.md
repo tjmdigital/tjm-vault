@@ -13,7 +13,7 @@ Run by `scripts/run.py`. The metric notes below were updated in place.
 
 | Metric | Now | Was |
 |---|---|---|
-| [[Conversions]] | 817 | 816 |
+| [[Conversions]] | 817 | - |
 | [[Leads created and routed]] | 329 | - |
 | [[Picked up and worked]] | 262 | - |
 | [[Qualified]] | 98 | - |
