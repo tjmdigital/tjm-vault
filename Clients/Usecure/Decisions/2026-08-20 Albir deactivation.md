@@ -72,3 +72,14 @@ than missed. No action outstanding on our side.
 > The first automated health check found
 > [[2026-08-22 Melchor Dormido still holds 1511 companies]], deactivated in June. Same
 > decision, same people absorbing the accounts - worth raising together.
+
+## Position
+
+Refreshed by the weekly check on 2026-08-22. Nothing here is written by hand - the prose above may quote older figures.
+
+| Albir Gendi | Now |
+|---|---|
+| Companies | 1,098 |
+| Contacts | 1,555 |
+| Open deals | 104 |
+| Open leads | 34 |

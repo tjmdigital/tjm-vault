@@ -27,6 +27,7 @@ Run by `scripts/run.py`. The metric notes below were updated in place.
 | Workflow state matches the vault | pass |
 | Every open lead has an owner | **1 finding(s)** |
 | No live work sitting with a deactivated user | **9 finding(s)** |
+| Notes about a leaver quote the live numbers | pass |
 | New business deals have a contact attached | **1 finding(s)** |
 | Two-stage triggers have all cleared | pass |
 | Every marketing event has an event record | pass |
@@ -46,18 +47,6 @@ Run by `scripts/run.py`. The metric notes below were updated in place.
 - **No live work sitting with a deactivated user** - 21,711 companies owned by 21 deactivated users - known backlog, not new
 - **New business deals have a contact attached** - 4 new-business deal(s) since launch with no contact
 
-## Issues
-
-- new - [[Open deal(s) still held by Natalie Wallace, deactivated (Usecure)]]
-- new - [[Open deal(s) still held by Dexter Mapfumo, deactivated (Usecure)]]
-- new - [[Open deal(s) still held by Josh McCann, deactivated (Usecure)]]
-- new - [[Open deal(s) still held by Richmond Asante, deactivated (Usecure)]]
-- new - [[Open deal(s) still held by Albir Gendi, deactivated (Usecure)]]
-- new - [[Open deal(s) still held by Sela Nicolas, deactivated (Usecure)]]
-- new - [[Open deal(s) still held by Melchor Dormido, deactivated (Usecure)]]
-- closed - [[Open deal(s) held by deactivated users (Usecure)]]
-- 4 still open, unchanged since last run
-
 ## Detail
 
 - Companies by deactivated owner: Natalie Wallace (3,696), Dexter Mapfumo (3,549), Josh McCann (2,914), Michelle Dickman (2,586), Liam Wright (1,748), Melchor Dormido (1,511), Richmond Asante (1,491), Albir Gendi (1,098), and 13 more
@@ -65,14 +54,5 @@ Run by `scripts/run.py`. The metric notes below were updated in place.
 ## Vault lint
 
 ```
-vault lint: 7 problem(s) across 91 notes
-
-broken link (7)
-   Clients/Usecure/Issues/Open deal(s) still held by Josh McCann, deactivated (Usecure).md -> [[that note]]
-   Clients/Usecure/Issues/Open deal(s) still held by Albir Gendi, deactivated (Usecure).md -> [[that note]]
-   Clients/Usecure/Issues/Open deal(s) still held by Natalie Wallace, deactivated (Usecure).md -> [[that note]]
-   Clients/Usecure/Issues/Open deal(s) still held by Melchor Dormido, deactivated (Usecure).md -> [[that note]]
-   Clients/Usecure/Issues/Open deal(s) still held by Dexter Mapfumo, deactivated (Usecure).md -> [[that note]]
-   Clients/Usecure/Issues/Open deal(s) still held by Sela Nicolas, deactivated (Usecure).md -> [[that note]]
-   Clients/Usecure/Issues/Open deal(s) still held by Richmond Asante, deactivated (Usecure).md -> [[that note]]
+vault lint: clean (91 notes)
 ```

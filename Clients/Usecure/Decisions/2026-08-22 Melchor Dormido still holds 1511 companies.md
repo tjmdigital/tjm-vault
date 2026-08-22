@@ -32,3 +32,14 @@ will absorb the accounts.
 > [!info] Why this is the monitor earning its keep
 > Nobody was looking for this. It surfaced because the check asks "does any deactivated user
 > still own an open lead" every week rather than when someone happens to wonder.
+
+## Position
+
+Refreshed by the weekly check on 2026-08-22. Nothing here is written by hand - the prose above may quote older figures.
+
+| Melchor Dormido | Now |
+|---|---|
+| Companies | 1,511 |
+| Contacts | 2,303 |
+| Open deals | 163 |
+| Open leads | 0 |
