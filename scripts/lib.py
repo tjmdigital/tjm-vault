@@ -122,7 +122,10 @@ class Registry:
                     repairable += [(ch["name"], t) for t in targets]
                 got = got or []
                 results.append((ch["name"], "findings" if got else "pass", len(got)))
-                findings += [(ch["name"], g) for g in got]
+                # a check yields a string, or (string, detail) where detail is a
+                # markdown block kept on the issue note and refreshed every run
+                findings += [(ch["name"], g[0], g[1]) if isinstance(g, tuple)
+                             else (ch["name"], g, None) for g in got]
             except Exception as e:
                 results.append((ch["name"], "UNKNOWN", str(e)[:120]))
         return results, findings, repairable
@@ -155,6 +158,16 @@ def issue_title(msg, client):
     return f"{t[:88].strip()} ({client})"
 
 
+def set_breakdown(s, detail):
+    """Replace the Breakdown block, or insert one after Current. It is a snapshot of
+    now, not a log - the History section is what carries the past."""
+    if not detail: return s
+    blk = f"## Breakdown\n\n{detail}\n"
+    if "## Breakdown" in s:
+        return re.sub(r"## Breakdown\n\n.*?(?=\n## )", blk, s, count=1, flags=re.S)
+    return s.replace("## History", blk + "\n## History", 1)
+
+
 def sync_issues(c, findings, ran_ok, today):
     """Create, update and close issue notes from this run's findings.
 
@@ -168,12 +181,12 @@ def sync_issues(c, findings, ran_ok, today):
     os.makedirs(d, exist_ok=True)
 
     seen, new, ongoing, closed = {}, [], [], []
-    for cat, msg in findings:
+    for cat, msg, detail in findings:
         if cat in ("Repaired",):        # an event, not a standing problem
             continue
-        seen[issue_title(msg, c.name)] = (cat, msg)
+        seen[issue_title(msg, c.name)] = (cat, msg, detail)
 
-    for title, (cat, msg) in seen.items():
+    for title, (cat, msg, detail) in seen.items():
         path = os.path.join(d, f"{title}.md")
         if os.path.exists(path):
             s = open(path).read()
@@ -191,6 +204,7 @@ def sync_issues(c, findings, ran_ok, today):
                 s = re.sub(r"^## Current\n\n.*$", f"## Current\n\n{msg}", s,
                            count=1, flags=re.M)
                 s = s.rstrip() + f"\n- {today} - {'returned - ' if back else ''}{msg}\n"
+            s = set_breakdown(s, detail)
             open(path, "w").write(s)
             ongoing.append(title)
         else:
@@ -201,7 +215,12 @@ def sync_issues(c, findings, ran_ok, today):
                 f"# {title}", "",
                 f"Found by the weekly health check, not by hand. It closes itself the",
                 f"week `{cat}` stops reporting it.", "",
-                "## Current", "", msg, "", "## History", "",
+                "If a hand-written note already covers this and has someone against it, add",
+                "`superseded_by: \"[[that note]]\"` here. The count keeps updating; Now shows",
+                "the other note instead of both. The run never touches that field.", "",
+                "## Current", "", msg,
+                *(["", "## Breakdown", "", detail] if detail else []),
+                "", "## History", "",
                 f"- {today} - first seen - {msg}", ""]))
             new.append(title)
 
@@ -255,7 +274,7 @@ def write_check(c, today, metrics, moved, results, findings, lint_out, issues=No
                 "UNKNOWN": f"**could not run** - {extra}"}[status]
         L.append(f"| {name} | {icon} |")
     if findings:
-        L += ["", "### Findings", ""] + [f"- **{cat}** - {msg}" for cat, msg in findings]
+        L += ["", "### Findings", ""] + [f"- **{cat}** - {msg}" for cat, msg, _ in findings]
     if issues:
         new_, ongoing, closed = issues
         if new_ or closed:

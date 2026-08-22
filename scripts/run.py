@@ -58,9 +58,9 @@ def run(mod_name, fix=False):
             findings = [x for x in findings if "out of sync" not in x[1]]
             results = [(n, "repaired" if "sync" in n else s_, e) for n, s_, e in results]
             findings.append(("Repaired", f"{tr} registrant and {ta} attendee association(s) "
-                                         f"across {len(repairable)} event(s)"))
+                                         f"across {len(repairable)} event(s)", None))
         if failures:
-            findings.append(("Repair failed", f"{len(failures)} could not be created"))
+            findings.append(("Repair failed", f"{len(failures)} could not be created", None))
             for f in failures[:10]: c.note(f)
 
     ran_ok = {n for n, s_, _ in results if s_ != "UNKNOWN"}
@@ -75,7 +75,7 @@ def run(mod_name, fix=False):
 
     icon = ":white_check_mark:" if clean else (":rotating_light:" if unknown else ":warning:")
     txt = f"{icon} {label}\n{m.get('_headline','')}\n"
-    for cat, msg in findings: txt += f"• {cat}: {msg}\n"
+    for cat, msg, _ in findings: txt += f"• {cat}: {msg}\n"
     for k in missing: txt += f"• Vault: no metric note for {k}\n"
     if lint_rc == 1:
         txt += f"• Vault lint: {lint_out.splitlines()[0] if lint_out else 'problems found'}\n"

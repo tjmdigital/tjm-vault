@@ -89,7 +89,8 @@ SORT built ASC
 
 Problems the automated run turned up, with the date they were first seen rather than the
 date they were last mentioned. Nothing here has a person against it yet - add a
-`waiting_on` to an issue note and it moves up into the sections above.
+`waiting_on` to an issue note and it moves up into the sections above, and a
+`superseded_by` where a hand-written note already covers the same problem.
 
 ```dataview
 TABLE WITHOUT ID
@@ -97,7 +98,7 @@ TABLE WITHOUT ID
   check AS "Found by",
   (date(today) - date(since)).days AS "days"
 FROM "Clients"
-WHERE type = "issue" AND status = "open" AND automated AND !waiting_on
+WHERE type = "issue" AND status = "open" AND automated AND !waiting_on AND !superseded_by
 SORT since ASC
 ```
 

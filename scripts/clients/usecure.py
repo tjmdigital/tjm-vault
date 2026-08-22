@@ -105,7 +105,15 @@ def _unowned(c):
 
 @check("No live work sitting with a deactivated user")
 def _leavers(c):
-    out, who, deals, backlog, people = [], [], 0, 0, 0
+    """Leads and deals are reported per person; companies as one total.
+
+    Leads and deals are live work - someone has to take each person's over, and
+    each hand-over lands on a different day, so they age separately. Companies are
+    a single bulk reassignment of long-standing records, so splitting 21 leavers
+    into 21 rows would bury the actionable work under a backlog nobody is working
+    through one owner at a time. The per-owner numbers still live on that note.
+    """
+    out, firms, backlog = [], [], 0
     _, gone = c.owners()
     for o in gone:
         nm = (o.get("firstName", "") + " " + o.get("lastName", "")).strip() or o.get("email")
@@ -115,17 +123,19 @@ def _leavers(c):
         if n: out.append(f"{n} open lead(s) still owned by {nm}, deactivated")
         d = c.count("deals", [[{"propertyName": "hubspot_owner_id", "operator": "EQ", "value": oid},
                                {"propertyName": "hs_is_closed", "operator": "EQ", "value": "false"}]])
-        if d: deals += d; who.append((nm, d))
+        if d: out.append(f"{d} open deal(s) still held by {nm}, deactivated")
         co = c.count("companies", [[{"propertyName": "hubspot_owner_id",
                                      "operator": "EQ", "value": oid}]])
-        if co: backlog += co; people += 1
-    if deals:
-        out.append(f"{deals} open deal(s) held by {len(who)} deactivated users")
-        c.note("Open deals by deactivated owner: " +
-               ", ".join(f"{n} ({d})" for n, d in sorted(who, key=lambda x: -x[1])))
+        if co: backlog += co; firms.append((nm, co))
     if backlog:
-        out.append(f"{backlog:,} companies owned by {people} deactivated users - "
-                   f"known backlog, not new")
+        firms.sort(key=lambda x: -x[1])
+        out.append((f"{backlog:,} companies owned by {len(firms)} deactivated users - "
+                    f"known backlog, not new",
+                    "| Owner | Companies |\n|---|---|\n" +
+                    "\n".join(f"| {n} | {v:,} |" for n, v in firms)))
+        c.note("Companies by deactivated owner: " +
+               ", ".join(f"{n} ({v:,})" for n, v in firms[:8]) +
+               (f", and {len(firms) - 8} more" if len(firms) > 8 else ""))
     return out
 
 

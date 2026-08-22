@@ -6,6 +6,7 @@ automated: true
 check: "No live work sitting with a deactivated user"
 since: 2026-08-22
 last_seen: 2026-08-22
+superseded_by: "[[2026-08-20 Albir deactivation]]"
 ---
 # Open lead(s) still owned by Albir Gendi, deactivated (Usecure)
 
