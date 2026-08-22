@@ -6,6 +6,7 @@ status: open
 waiting_on: ["[[Molly McManamon]]"]
 blocked_on: "where Melchor's 1,511 companies and 163 open deals should go"
 since: 2026-08-22
+tracks_owner: "Melchor Dormido"
 ---
 # Melchor Dormido still holds 1,511 companies
 

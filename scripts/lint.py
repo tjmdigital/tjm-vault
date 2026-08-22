@@ -8,6 +8,10 @@ Exit 0 = clean, 1 = problems found.
 import os, re, sys, collections, datetime
 
 VAULT = os.environ.get("VAULT_PATH", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Obsidian does not resolve a wikilink inside code, and neither should we. Without
+# this, documentation that shows the syntax reads as a link to a note called "that
+# note", and every note carrying that boilerplate adds a phantom broken link.
+CODE = re.compile(r"^```.*?^```|`[^`\n]*`", re.S | re.M)
 SKIP = (".git", ".obsidian", "Templates", "scripts")
 TYPES = {"system","issue","metric","decision","workflow","property","check",
          "meeting","person","pattern","platform","client"}
@@ -41,7 +45,7 @@ def main():
     inbound = collections.defaultdict(set)
     for p in paths:
         _, s = fm(p)
-        for m in re.findall(r"\[\[([^\]|#]+)", s):
+        for m in re.findall(r"\[\[([^\]|#]+)", CODE.sub("", s)):
             m = m.strip()
             if not m: continue
             if m in names: inbound[m].add(p)

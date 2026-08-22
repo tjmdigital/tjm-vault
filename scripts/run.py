@@ -64,7 +64,7 @@ def run(mod_name, fix=False):
             for f in failures[:10]: c.note(f)
 
     ran_ok = {n for n, s_, _ in results if s_ != "UNKNOWN"}
-    issues = lib.sync_issues(c, findings, ran_ok, today)
+    issues = lib.sync_issues(c, findings, ran_ok, today, mod.check.event_names)
 
     lint_rc, lint_out = lib.run_lint()
     lib.write_check(c, today, m, moved, results, findings, lint_out, issues)

@@ -22,6 +22,7 @@ class Client:
         self.token_env = token_env
         self.folder  = os.path.join(VAULT, "Clients", name)
         self.detail  = []
+        self.today   = datetime.date.today().isoformat()
         self.H = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
 
     # ---------------------------------------------------------- hubspot
@@ -106,11 +107,19 @@ class Registry:
     def __init__(self):
         self.checks = []
 
-    def __call__(self, name, repairs=False):
+    def __call__(self, name, repairs=False, events=False):
+        """events=True marks a check whose findings are things that happened, not
+        things that are wrong. Those get reported but never become issue notes -
+        an issue note has to be something that can still be open next week."""
         def deco(fn):
-            self.checks.append({"name": name, "fn": fn, "repairs": repairs})
+            self.checks.append({"name": name, "fn": fn, "repairs": repairs,
+                                "events": events})
             return fn
         return deco
+
+    @property
+    def event_names(self):
+        return {ch["name"] for ch in self.checks if ch["events"]}
 
     def run(self, c):
         results, findings, repairable = [], [], []
@@ -158,17 +167,24 @@ def issue_title(msg, client):
     return f"{t[:88].strip()} ({client})"
 
 
+def set_block(s, heading, body, before=None):
+    """Replace a `## heading` section with body, or add one. A snapshot of now -
+    anything that needs to survive belongs in prose the run never touches."""
+    if body is None: return s
+    blk = f"## {heading}\n\n{body}\n"
+    if f"## {heading}" in s:
+        return re.sub(rf"## {re.escape(heading)}\n\n.*?(?=\n## |\Z)", blk, s,
+                      count=1, flags=re.S)
+    if before and before in s:
+        return s.replace(before, blk + "\n" + before, 1)
+    return s.rstrip() + "\n\n" + blk
+
+
 def set_breakdown(s, detail):
-    """Replace the Breakdown block, or insert one after Current. It is a snapshot of
-    now, not a log - the History section is what carries the past."""
-    if not detail: return s
-    blk = f"## Breakdown\n\n{detail}\n"
-    if "## Breakdown" in s:
-        return re.sub(r"## Breakdown\n\n.*?(?=\n## )", blk, s, count=1, flags=re.S)
-    return s.replace("## History", blk + "\n## History", 1)
+    return set_block(s, "Breakdown", detail, before="## History")
 
 
-def sync_issues(c, findings, ran_ok, today):
+def sync_issues(c, findings, ran_ok, today, events=()):
     """Create, update and close issue notes from this run's findings.
 
     ran_ok is the set of check names that completed. A check that errored tells
@@ -182,7 +198,7 @@ def sync_issues(c, findings, ran_ok, today):
 
     seen, new, ongoing, closed = {}, [], [], []
     for cat, msg, detail in findings:
-        if cat in ("Repaired",):        # an event, not a standing problem
+        if cat == "Repaired" or cat in events:   # happened, not still wrong
             continue
         seen[issue_title(msg, c.name)] = (cat, msg, detail)
 

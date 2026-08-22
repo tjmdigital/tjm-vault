@@ -77,6 +77,8 @@ def current_labels(c, event_id):
         if not after: return cur
 
 
+import os, re
+import lib
 from lib import Registry
 
 check = Registry()
@@ -136,6 +138,56 @@ def _leavers(c):
         c.note("Companies by deactivated owner: " +
                ", ".join(f"{n} ({v:,})" for n, v in firms[:8]) +
                (f", and {len(firms) - 8} more" if len(firms) > 8 else ""))
+    return out
+
+
+@check("Notes about a leaver quote the live numbers", events=True)
+def _leaver_notes(c):
+    """Any note with `tracks_owner:` gets a Position block the run keeps current.
+
+    A hand-written note quotes a number once, on the day it was written, and is
+    silently wrong from then on. Albir's note said 185 open deals; 104 were open
+    and 77 had closed. Molly would have been given a figure 78% too high. So the
+    numbers come out of the prose and into a block nothing edits by hand.
+    """
+    out = []
+    active, gone = c.owners()
+    ids = {}
+    for o in c.api("/crm/v3/owners?limit=200")["results"] + gone:
+        nm = (o.get("firstName", "") + " " + o.get("lastName", "")).strip()
+        if nm: ids[nm.lower()] = o["id"]
+
+    for path in c.notes(""):
+        f = c.frontmatter(path)
+        who = (f.get("tracks_owner") or "").strip().strip('"')
+        if not who: continue
+        oid = ids.get(who.lower())
+        if not oid:
+            out.append(f"{os.path.basename(path)[:-3]} tracks {who}, who is not a "
+                       f"HubSpot owner - check the spelling")
+            continue
+        OWNS = {"propertyName": "hubspot_owner_id", "operator": "EQ", "value": oid}
+        now = {
+            "Companies":  c.count("companies", [[OWNS]]),
+            "Contacts":   c.count("contacts",  [[OWNS]]),
+            "Open deals": c.count("deals", [[OWNS, {"propertyName": "hs_is_closed",
+                                                    "operator": "EQ", "value": "false"}]]),
+            "Open leads": c.count("0-136", [[OPEN, LIVE, OWNS]]),
+        }
+        s = open(path).read()
+        # only read the Position block - another table in the note is not our business
+        blk = re.search(r"## Position\n\n.*?(?=\n## |\Z)", s, re.S)
+        was = dict(re.findall(r"^\| ([A-Za-z ]+) \| ([\d,]+) \|$",
+                              blk.group(0) if blk else "", re.M))
+        body = (f"Refreshed by the weekly check on {c.today}. Nothing here is written by "
+                f"hand - the prose above may quote older figures.\n\n"
+                f"| {who} | Now |\n|---|---|\n"
+                + "\n".join(f"| {k} | {v:,} |" for k, v in now.items()))
+        open(path, "w").write(lib.set_block(s, "Position", body))
+        for k, v in now.items():
+            before = was.get(k)
+            if before is not None and before.replace(",", "") != str(v):
+                out.append(f"{who}: {k.lower()} {before} -> {v:,}")
     return out
 
 

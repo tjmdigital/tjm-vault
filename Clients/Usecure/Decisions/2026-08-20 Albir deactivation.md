@@ -6,6 +6,7 @@ status: open
 waiting_on: ["[[Molly McManamon]]"]
 blocked_on: "where Albir's 1,235 companies and 35 open leads should go - Molly back w/c 25 Aug"
 since: 2026-08-20
+tracks_owner: "Albir Gendi"
 ---
 # Where do Albir's records go
 
