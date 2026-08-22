@@ -65,3 +65,9 @@ team rather than RevOps, and is not something TJM can action or chase from here.
 
 Recorded so that if a prospect joins an empty call next week, it is on file as known rather
 than missed. No action outstanding on our side.
+
+
+> [!warning] He is not the only one
+> The first automated health check found
+> [[2026-08-22 Melchor Dormido still holds 1511 companies]], deactivated in June. Same
+> decision, same people absorbing the accounts - worth raising together.
