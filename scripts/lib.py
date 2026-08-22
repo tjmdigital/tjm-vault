@@ -128,6 +128,104 @@ class Registry:
         return results, findings, repairable
 
 
+
+# ------------------------------------------------------------------ issues
+# A finding recorded once a week in a Check note is a log, not a memory. These
+# turn each finding into a note that has a first-seen date, so Now can age it,
+# and that closes itself the week the finding stops appearing.
+ISSUE_HEAD = "## Current\n"
+
+
+def issue_key(msg):
+    """Stable identity for a finding whose count changes week to week.
+
+    "801 open deal(s) held by 7 deactivated users" and next week's 794 are the
+    same problem, so the numbers come out. A name stays in, because Albir's
+    leads and Melchor's leads are genuinely different problems.
+    """
+    t = re.sub(r"\d[\d,]*", "", msg)
+    t = re.sub(r"\s+", " ", t).strip(" -,.")
+    return t
+
+
+def issue_title(msg, client):
+    t = issue_key(msg)
+    t = t[:1].upper() + t[1:]
+    t = re.sub(r'[\\/:*?"<>|#\[\]^]', "-", t)
+    return f"{t[:88].strip()} ({client})"
+
+
+def sync_issues(c, findings, ran_ok, today):
+    """Create, update and close issue notes from this run's findings.
+
+    ran_ok is the set of check names that completed. A check that errored tells
+    us nothing about its issues, so they are left alone rather than closed -
+    silence from a broken check must never read as a problem going away.
+
+    Returns (new, ongoing, closed) as lists of titles.
+    """
+    d = os.path.join(c.folder, "Issues")
+    os.makedirs(d, exist_ok=True)
+
+    seen, new, ongoing, closed = {}, [], [], []
+    for cat, msg in findings:
+        if cat in ("Repaired",):        # an event, not a standing problem
+            continue
+        seen[issue_title(msg, c.name)] = (cat, msg)
+
+    for title, (cat, msg) in seen.items():
+        path = os.path.join(d, f"{title}.md")
+        if os.path.exists(path):
+            s = open(path).read()
+            was = re.search(r"^## Current\n\n(.*)$", s, re.M)
+            was = was.group(1).strip() if was else ""
+            back = "status: resolved" in s
+            s = re.sub(r"^status: .*$", "status: open", s, count=1, flags=re.M)
+            s = re.sub(r"^last_seen: .*$", f"last_seen: {today}", s, count=1, flags=re.M)
+            s = re.sub(r"^resolved: .*\n", "", s, flags=re.M)
+            if back:
+                # it went away and came back. The day counter should measure this
+                # spell, not the original one - the history keeps the earlier run.
+                s = re.sub(r"^since: .*$", f"since: {today}", s, count=1, flags=re.M)
+            if was != msg or back:
+                s = re.sub(r"^## Current\n\n.*$", f"## Current\n\n{msg}", s,
+                           count=1, flags=re.M)
+                s = s.rstrip() + f"\n- {today} - {'returned - ' if back else ''}{msg}\n"
+            open(path, "w").write(s)
+            ongoing.append(title)
+        else:
+            open(path, "w").write("\n".join([
+                "---", "type: issue", f"client: {c.name}", "status: open",
+                "automated: true", f"check: \"{cat}\"",
+                f"since: {today}", f"last_seen: {today}", "---",
+                f"# {title}", "",
+                f"Found by the weekly health check, not by hand. It closes itself the",
+                f"week `{cat}` stops reporting it.", "",
+                "## Current", "", msg, "", "## History", "",
+                f"- {today} - first seen - {msg}", ""]))
+            new.append(title)
+
+    # close anything this run's working checks no longer report
+    for path in c.notes("Issues"):
+        f = c.frontmatter(path)
+        if f.get("automated") != "true" or f.get("status") != "open":
+            continue
+        title = os.path.basename(path)[:-3]
+        if title in seen:
+            continue
+        if f.get("check", "").strip('"') not in ran_ok:
+            continue                    # its check did not run - say nothing
+        s = open(path).read()
+        s = re.sub(r"^status: .*$", "status: resolved", s, count=1, flags=re.M)
+        s = re.sub(r"^last_seen: (.*)$", f"last_seen: \\1\nresolved: {today}",
+                   s, count=1, flags=re.M)
+        s = s.rstrip() + f"\n- {today} - no longer reported, closed\n"
+        open(path, "w").write(s)
+        closed.append(title)
+
+    return new, ongoing, closed
+
+
 # ------------------------------------------------------------------ shared
 def run_lint():
     try:
@@ -139,7 +237,7 @@ def run_lint():
         return 2, f"lint could not run: {e}"
 
 
-def write_check(c, today, metrics, moved, results, findings, lint_out):
+def write_check(c, today, metrics, moved, results, findings, lint_out, issues=None):
     d = os.path.join(c.folder, "Checks")
     os.makedirs(d, exist_ok=True)
     L = ["---", "type: check", f"client: {c.name}", f"date: {today}",
@@ -158,6 +256,13 @@ def write_check(c, today, metrics, moved, results, findings, lint_out):
         L.append(f"| {name} | {icon} |")
     if findings:
         L += ["", "### Findings", ""] + [f"- **{cat}** - {msg}" for cat, msg in findings]
+    if issues:
+        new_, ongoing, closed = issues
+        if new_ or closed:
+            L += ["", "## Issues", ""]
+            for t in new_:  L.append(f"- new - [[{t}]]")
+            for t in closed: L.append(f"- closed - [[{t}]]")
+            if ongoing: L.append(f"- {len(ongoing)} still open, unchanged since last run")
     if c.detail:
         L += ["", "## Detail", ""] + [f"- {x}" for x in c.detail]
     L += ["", "## Vault lint", "", "```", lint_out or "clean", "```"]

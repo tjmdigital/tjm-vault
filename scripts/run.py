@@ -63,8 +63,11 @@ def run(mod_name, fix=False):
             findings.append(("Repair failed", f"{len(failures)} could not be created"))
             for f in failures[:10]: c.note(f)
 
+    ran_ok = {n for n, s_, _ in results if s_ != "UNKNOWN"}
+    issues = lib.sync_issues(c, findings, ran_ok, today)
+
     lint_rc, lint_out = lib.run_lint()
-    lib.write_check(c, today, m, moved, results, findings, lint_out)
+    lib.write_check(c, today, m, moved, results, findings, lint_out, issues)
 
     unknown = [n for n, s_, _ in results if s_ == "UNKNOWN"]
     passed  = [n for n, s_, _ in results if s_ in ("pass", "repaired")]
@@ -78,6 +81,9 @@ def run(mod_name, fix=False):
         txt += f"• Vault lint: {lint_out.splitlines()[0] if lint_out else 'problems found'}\n"
     for n in unknown:
         txt += f"• :grey_question: {n} - could not run, result unknown not clear\n"
+    new_i, _ongoing, closed_i = issues
+    for t in new_i:  txt += f"• :new: first time seen: {t}\n"
+    for t in closed_i: txt += f"• :heavy_check_mark: cleared since last run: {t}\n"
     # always say what was checked, so a silent check is distinguishable from a clean one
     txt += (f"_{len(passed)}/{len(results)} checks passed"
             + (f", {len(unknown)} could not run" if unknown else "")
