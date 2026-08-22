@@ -26,7 +26,7 @@ Run by `scripts/run.py`. The metric notes below were updated in place.
 |---|---|
 | Workflow state matches the vault | pass |
 | Every open lead has an owner | **1 finding(s)** |
-| No live work sitting with a deactivated user | **3 finding(s)** |
+| No live work sitting with a deactivated user | **9 finding(s)** |
 | New business deals have a contact attached | **1 finding(s)** |
 | Two-stage triggers have all cleared | pass |
 | Every marketing event has an event record | pass |
@@ -35,25 +35,44 @@ Run by `scripts/run.py`. The metric notes below were updated in place.
 ### Findings
 
 - **Every open lead has an owner** - 2 open lead(s) with no owner
+- **No live work sitting with a deactivated user** - 117 open deal(s) still held by Natalie Wallace, deactivated
+- **No live work sitting with a deactivated user** - 174 open deal(s) still held by Dexter Mapfumo, deactivated
+- **No live work sitting with a deactivated user** - 68 open deal(s) still held by Josh McCann, deactivated
+- **No live work sitting with a deactivated user** - 94 open deal(s) still held by Richmond Asante, deactivated
 - **No live work sitting with a deactivated user** - 34 open lead(s) still owned by Albir Gendi, deactivated
-- **No live work sitting with a deactivated user** - 801 open deal(s) held by 7 deactivated users
+- **No live work sitting with a deactivated user** - 104 open deal(s) still held by Albir Gendi, deactivated
+- **No live work sitting with a deactivated user** - 81 open deal(s) still held by Sela Nicolas, deactivated
+- **No live work sitting with a deactivated user** - 163 open deal(s) still held by Melchor Dormido, deactivated
 - **No live work sitting with a deactivated user** - 21,711 companies owned by 21 deactivated users - known backlog, not new
 - **New business deals have a contact attached** - 4 new-business deal(s) since launch with no contact
 
 ## Issues
 
-- new - [[Open lead(s) with no owner (Usecure)]]
-- new - [[Open lead(s) still owned by Albir Gendi, deactivated (Usecure)]]
-- new - [[Open deal(s) held by deactivated users (Usecure)]]
-- new - [[Companies owned by deactivated users - known backlog, not new (Usecure)]]
-- new - [[New-business deal(s) since launch with no contact (Usecure)]]
+- new - [[Open deal(s) still held by Natalie Wallace, deactivated (Usecure)]]
+- new - [[Open deal(s) still held by Dexter Mapfumo, deactivated (Usecure)]]
+- new - [[Open deal(s) still held by Josh McCann, deactivated (Usecure)]]
+- new - [[Open deal(s) still held by Richmond Asante, deactivated (Usecure)]]
+- new - [[Open deal(s) still held by Albir Gendi, deactivated (Usecure)]]
+- new - [[Open deal(s) still held by Sela Nicolas, deactivated (Usecure)]]
+- new - [[Open deal(s) still held by Melchor Dormido, deactivated (Usecure)]]
+- closed - [[Open deal(s) held by deactivated users (Usecure)]]
+- 4 still open, unchanged since last run
 
 ## Detail
 
-- Open deals by deactivated owner: Dexter Mapfumo (174), Melchor Dormido (163), Natalie Wallace (117), Albir Gendi (104), Richmond Asante (94), Sela Nicolas (81), Josh McCann (68)
+- Companies by deactivated owner: Natalie Wallace (3,696), Dexter Mapfumo (3,549), Josh McCann (2,914), Michelle Dickman (2,586), Liam Wright (1,748), Melchor Dormido (1,511), Richmond Asante (1,491), Albir Gendi (1,098), and 13 more
 
 ## Vault lint
 
 ```
-vault lint: clean (84 notes)
+vault lint: 7 problem(s) across 91 notes
+
+broken link (7)
+   Clients/Usecure/Issues/Open deal(s) still held by Josh McCann, deactivated (Usecure).md -> [[that note]]
+   Clients/Usecure/Issues/Open deal(s) still held by Albir Gendi, deactivated (Usecure).md -> [[that note]]
+   Clients/Usecure/Issues/Open deal(s) still held by Natalie Wallace, deactivated (Usecure).md -> [[that note]]
+   Clients/Usecure/Issues/Open deal(s) still held by Melchor Dormido, deactivated (Usecure).md -> [[that note]]
+   Clients/Usecure/Issues/Open deal(s) still held by Dexter Mapfumo, deactivated (Usecure).md -> [[that note]]
+   Clients/Usecure/Issues/Open deal(s) still held by Sela Nicolas, deactivated (Usecure).md -> [[that note]]
+   Clients/Usecure/Issues/Open deal(s) still held by Richmond Asante, deactivated (Usecure).md -> [[that note]]
 ```
