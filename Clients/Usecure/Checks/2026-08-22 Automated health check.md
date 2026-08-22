@@ -13,11 +13,11 @@ Run by `scripts/checks.py`. Metric notes have been updated in place.
 
 | Metric | Now | Was |
 |---|---|---|
-| [[Conversions]] | 816 | 789 |
+| [[Conversions]] | 816 | - |
 | [[Leads created and routed]] | 329 | - |
-| [[Picked up and worked]] | 262 | 233 |
-| [[Qualified]] | 98 | 96 |
-| [[Open leads]] | 260 | 251 |
+| [[Picked up and worked]] | 262 | - |
+| [[Qualified]] | 98 | - |
+| [[Open leads]] | 260 | - |
 
 Worked rate: **80%** of leads since launch.
 
