@@ -6,6 +6,7 @@ automated: true
 check: "No live work sitting with a deactivated user"
 since: 2026-08-22
 last_seen: 2026-08-22
+superseded_by: "[[2026-08-22 Melchor Dormido still holds 1511 companies]]"
 ---
 # Open deal(s) still held by Melchor Dormido, deactivated (Usecure)
 

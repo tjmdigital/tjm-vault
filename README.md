@@ -56,6 +56,74 @@ Nothing secret goes in this repo. No API tokens, no portal passwords, no client 
 Notes refer to them by name (`USECURE_HUBSPOT_TOKEN`) and the values live in a local
 gitignored `.env`.
 
+## The weekly check
+
+A scheduled cloud run every Wednesday at 15:00 UK, from `scripts/`. It needs nothing on
+anyone's laptop - it clones this repo, runs, and pushes back.
+
+```
+scripts/run.py <client> [--fix]     one client
+scripts/run.py --all                every module in scripts/clients/
+scripts/lint.py                     conventions only, no API calls
+```
+
+Exit 0 clean, 1 findings, 2 could not run. **2 is not 0** - a check that could not run is
+reported as unknown and never counted as a pass, because a broken check going quiet must
+never read as a problem going away.
+
+What one run does:
+
+1. Re-counts every metric and writes `value:` and `verified:` back into its note
+2. Runs each check independently, so one failing never hides the rest
+3. Repairs what is safely repairable - currently missing event associations
+4. Turns findings into issue notes under `Clients/<name>/Issues/`
+5. Refreshes the `## Position` block on any note carrying `tracks_owner:`
+6. Lints, writes a dated note to `Checks/`, commits, pushes, posts to Slack
+
+### Issue notes
+
+A finding written once a week is a log. An issue note is a memory: it carries `since`
+(first seen), a history of every change in the number, and it sets `status: resolved` on
+the run where the finding stops appearing. `Now` ages them off `since`.
+
+Three fields decide whether one shows on `Now`:
+
+| Field | Effect |
+|---|---|
+| `waiting_on` | moves it up into the human sections - it has a name against it now |
+| `superseded_by` | a hand-written note already covers it; the count keeps updating, `Now` shows the other note |
+| `status` | set to `resolved` by the run itself, never by hand |
+
+If a problem clears and comes back, `since` resets to the return date, so the day counter
+measures this spell rather than the original one. The history keeps both.
+
+### Adding a check
+
+One decorated function in the client module. Nothing else changes.
+
+```python
+@check("Every open lead has an owner")
+def _unowned(c):
+    n = c.count("0-136", [[OPEN, LIVE, NO_OWNER]])
+    return [f"{n} open lead(s) with no owner"] if n else []
+```
+
+Return a list of strings, or `[]` when clean. Return `(message, markdown)` instead of a
+string to attach a table the run keeps current on the issue note. Add `events=True` to the
+decorator for a check that reports things that *happened* rather than things that are
+*wrong* - those get reported but never become issue notes.
+
+### Adding a client
+
+One file in `scripts/clients/`, with `NAME`, `TOKEN_ENV`, a `metrics(c)` function and its
+checks. `run.py --all` picks it up automatically.
+
+### Where the numbers come from
+
+Nothing quotes a count in prose and hopes. Metric notes are rewritten each run. Notes about
+a person's records carry `tracks_owner:` and get a `## Position` table refreshed weekly -
+Albir's note said 185 open deals when 104 were open and 77 had closed.
+
 ## Requires
 
 - [Dataview](https://github.com/blacksmithgu/obsidian-dataview) - most queries need it
