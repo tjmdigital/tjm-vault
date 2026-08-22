@@ -40,6 +40,14 @@ Run by `scripts/run.py`. The metric notes below were updated in place.
 - **No live work sitting with a deactivated user** - 21,711 companies owned by 21 deactivated users - known backlog, not new
 - **New business deals have a contact attached** - 4 new-business deal(s) since launch with no contact
 
+## Issues
+
+- new - [[Open lead(s) with no owner (Usecure)]]
+- new - [[Open lead(s) still owned by Albir Gendi, deactivated (Usecure)]]
+- new - [[Open deal(s) held by deactivated users (Usecure)]]
+- new - [[Companies owned by deactivated users - known backlog, not new (Usecure)]]
+- new - [[New-business deal(s) since launch with no contact (Usecure)]]
+
 ## Detail
 
 - Open deals by deactivated owner: Dexter Mapfumo (174), Melchor Dormido (163), Natalie Wallace (117), Albir Gendi (104), Richmond Asante (94), Sela Nicolas (81), Josh McCann (68)
@@ -47,5 +55,5 @@ Run by `scripts/run.py`. The metric notes below were updated in place.
 ## Vault lint
 
 ```
-vault lint: clean (79 notes)
+vault lint: clean (84 notes)
 ```
