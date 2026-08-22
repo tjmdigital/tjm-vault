@@ -1,8 +1,8 @@
 ---
 type: metric
 client: Usecure
-value: 233
-verified: 2026-08-21
+value: 262
+verified: 2026-08-22
 decays: 7
 filter: "hs_v2_date_entered_{attempting|connected|qualified} IS_KNOWN AND hs_createdate >= 2026-07-21"
 supersedes: "[[Any movement out of New]]"

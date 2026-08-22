@@ -1,8 +1,8 @@
 ---
 type: metric
 client: Usecure
-value: 251
-verified: 2026-08-21
+value: 260
+verified: 2026-08-22
 decays: 7
 filter: "hs_lead_is_open_v2 = true"
 ---

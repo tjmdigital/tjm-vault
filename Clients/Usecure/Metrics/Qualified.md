@@ -1,8 +1,8 @@
 ---
 type: metric
 client: Usecure
-value: 96
-verified: 2026-08-21
+value: 98
+verified: 2026-08-22
 decays: 7
 filter: "hs_pipeline_stage = qualified-stage-id AND hs_createdate >= 2026-07-21"
 ---
